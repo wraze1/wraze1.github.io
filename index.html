@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎰 МИНИ-КАЗИНО</title>
+    <title>🎮 МИНИ-КАЗИНО</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -115,7 +115,7 @@
 
         .result {
             text-align: center;
-            font-size: 32px;
+            font-size: 24px;
             margin: 20px 0;
             padding: 20px;
             border-radius: 20px;
@@ -129,10 +129,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎮 МИНИ-ИГРЫ</h1>
+        <h1>🎮 МИНИ-КАЗИНО</h1>
         
         <div class="balance" id="balance">
-            Загрузка...
+            <span id="balanceValue">Загрузка...</span>
         </div>
 
         <div class="games-grid">
@@ -154,8 +154,8 @@
             </div>
         </div>
 
-        <div id="gameBlock" class="bet-block">
-            <div style="font-size: 24px; margin-bottom: 10px;" id="selectedGame">🎮 Выбери игру</div>
+        <div class="bet-block">
+            <div style="font-size: 20px; margin-bottom: 10px; color: #ffd700;" id="selectedGame">👉 Выбери игру</div>
             <input type="number" id="bet" class="bet-input" value="10" min="1" placeholder="Ставка">
             <button class="play-btn" onclick="playGame()">🎮 ИГРАТЬ</button>
         </div>
@@ -169,8 +169,14 @@
         let tg = window.Telegram.WebApp;
         let selectedGame = '';
         
+        // Показываем на весь экран
         tg.expand();
         tg.ready();
+        
+        // Запрашиваем баланс при загрузке
+        setTimeout(function() {
+            tg.sendData(JSON.stringify({action: 'get_balance'}));
+        }, 500);
         
         function selectGame(game) {
             selectedGame = game;
@@ -179,20 +185,22 @@
         
         function playGame() {
             if (!selectedGame) {
-                tg.showAlert('Сначала выбери игру!');
+                tg.showAlert('❌ Сначала выбери игру!');
                 return;
             }
             
             let bet = document.getElementById('bet').value;
             
             if (bet < 1) {
-                tg.showAlert('Ставка должна быть больше 0!');
+                tg.showAlert('❌ Ставка должна быть больше 0!');
                 return;
             }
             
+            // Показываем результат
             document.getElementById('resultBlock').classList.remove('hidden');
             document.getElementById('resultText').innerHTML = '⏳ Играем...';
             
+            // Отправляем запрос в бота
             tg.sendData(JSON.stringify({
                 action: 'play',
                 game: selectedGame,
@@ -200,7 +208,30 @@
             }));
         }
         
-        tg.onEvent('mainButtonClicked', function() {
+        // Слушаем ответы от бота
+        tg.onEvent('message', function(event) {
+            try {
+                let data = JSON.parse(event.data);
+                console.log('Получены данные:', data);
+                
+                if (data.balance !== undefined) {
+                    document.getElementById('balanceValue').innerHTML = data.balance + ' 🌟';
+                }
+                
+                if (data.result) {
+                    document.getElementById('resultText').innerHTML = data.result;
+                    
+                    if (data.new_balance !== undefined) {
+                        document.getElementById('balanceValue').innerHTML = data.new_balance + ' 🌟';
+                    }
+                }
+            } catch (e) {
+                console.log('Ошибка парсинга:', e);
+            }
+        });
+        
+        // Кнопка назад
+        tg.onEvent('backButtonClicked', function() {
             tg.close();
         });
     </script>
