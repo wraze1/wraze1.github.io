@@ -3,167 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎮 МИНИ-КАЗИНО</title>
+    <title>🎮 Мини-казино</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
             min-height: 100vh;
-            padding: 20px;
         }
-
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 32px;
-            margin: 20px 0;
-            color: #ffd700;
-            text-shadow: 0 0 15px rgba(255,215,0,0.3);
-        }
-
         .balance {
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
+            font-size: 32px;
+            background: #ffd700;
+            color: #1a1a2e;
             padding: 20px;
-            margin-bottom: 30px;
-            text-align: center;
-            font-size: 24px;
-            border: 2px solid #ffd700;
+            border-radius: 20px;
+            margin: 20px;
+            font-weight: bold;
         }
-
-        .games-grid {
+        .games {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin: 20px;
         }
-
-        .game-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
-            padding: 25px 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.3s;
-            border: 2px solid transparent;
-        }
-
-        .game-card:hover {
-            border-color: #ffd700;
-            transform: scale(1.05);
-            background: rgba(255,215,0,0.1);
-        }
-
-        .game-emoji {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-
-        .game-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ffd700;
-        }
-
-        .bet-block {
-            background: rgba(255,255,255,0.05);
-            border-radius: 20px;
+        .game-btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid #ffd700;
             padding: 20px;
-            margin-top: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: 0.3s;
         }
-
+        .game-btn.selected {
+            background: #ffd700;
+            color: #1a1a2e;
+            transform: scale(1.05);
+        }
         .bet-input {
-            width: 100%;
+            font-size: 24px;
             padding: 15px;
-            font-size: 20px;
+            margin: 20px;
+            width: 200px;
             border: 2px solid #ffd700;
             border-radius: 15px;
             background: #1a1a2e;
             color: white;
             text-align: center;
-            margin: 15px 0;
         }
-
         .play-btn {
-            width: 100%;
-            padding: 20px;
-            font-size: 24px;
-            font-weight: bold;
-            background: linear-gradient(45deg, #ffd700, #ffa500);
+            background: #ffd700;
+            color: #1a1a2e;
+            font-size: 32px;
+            padding: 20px 50px;
             border: none;
             border-radius: 50px;
-            color: #1a1a2e;
             cursor: pointer;
-            transition: 0.3s;
+            font-weight: bold;
+            margin: 20px;
         }
-
-        .play-btn:hover {
-            transform: scale(1.05);
-        }
-
         .result {
-            text-align: center;
             font-size: 24px;
-            margin: 20px 0;
+            margin: 20px;
             padding: 20px;
-            border-radius: 20px;
+            border-radius: 15px;
             background: rgba(255,255,255,0.1);
-        }
-
-        .hidden {
-            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎮 МИНИ-КАЗИНО</h1>
-        
-        <div class="balance" id="balance">
-            Загрузка...
-        </div>
-
-        <div class="games-grid">
-            <div class="game-card" onclick="selectGame('Ракета')">
-                <div class="game-emoji">🚀</div>
-                <div class="game-title">Ракета</div>
-            </div>
-            <div class="game-card" onclick="selectGame('Стройка')">
-                <div class="game-emoji">🏗️</div>
-                <div class="game-title">Стройка</div>
-            </div>
-            <div class="game-card" onclick="selectGame('Кости')">
-                <div class="game-emoji">🎲</div>
-                <div class="game-title">Кости</div>
-            </div>
-            <div class="game-card" onclick="selectGame('Слоты')">
-                <div class="game-emoji">🎰</div>
-                <div class="game-title">Слоты</div>
-            </div>
-        </div>
-
-        <div class="bet-block">
-            <div style="font-size: 20px; margin-bottom: 10px; color: #ffd700;" id="selectedGame">👉 Выбери игру</div>
-            <input type="number" id="bet" class="bet-input" value="10" min="1" placeholder="Ставка">
-            <button class="play-btn" onclick="playGame()">🎮 ИГРАТЬ</button>
-        </div>
-
-        <div id="resultBlock" class="result hidden">
-            <div id="resultText"></div>
-        </div>
+    <div class="balance" id="balance">Загрузка...</div>
+    
+    <div class="games">
+        <div class="game-btn" onclick="selectGame('Ракета')">🚀 Ракета</div>
+        <div class="game-btn" onclick="selectGame('Стройка')">🏗️ Стройка</div>
+        <div class="game-btn" onclick="selectGame('Кости')">🎲 Кости</div>
+        <div class="game-btn" onclick="selectGame('Слоты')">🎰 Слоты</div>
     </div>
+
+    <input type="number" id="bet" class="bet-input" value="10" min="1">
+    <br>
+    <button class="play-btn" onclick="play()">🎮 ИГРАТЬ</button>
+    
+    <div class="result" id="result"></div>
 
     <script>
         let tg = window.Telegram.WebApp;
@@ -177,24 +103,27 @@
         
         function selectGame(game) {
             selectedGame = game;
-            document.getElementById('selectedGame').innerHTML = '🎮 ' + game;
+            // Убираем выделение со всех
+            document.querySelectorAll('.game-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            // Выделяем выбранную
+            event.target.classList.add('selected');
         }
         
-        function playGame() {
+        function play() {
             if (!selectedGame) {
-                tg.showAlert('❌ Сначала выбери игру!');
+                tg.showAlert('❌ Выбери игру!');
                 return;
             }
             
             let bet = document.getElementById('bet').value;
-            
             if (bet < 1) {
                 tg.showAlert('❌ Ставка должна быть больше 0!');
                 return;
             }
             
-            document.getElementById('resultBlock').classList.remove('hidden');
-            document.getElementById('resultText').innerHTML = '⏳ Играем...';
+            document.getElementById('result').innerHTML = '⏳ Играем...';
             
             tg.sendData(JSON.stringify({
                 action: 'play',
@@ -205,28 +134,20 @@
         
         // Слушаем ответы
         tg.onEvent('message', function(event) {
-            try {
-                let data = JSON.parse(event.data);
-                console.log('Получено:', data);
-                
-                if (data.balance !== undefined) {
-                    document.getElementById('balance').innerHTML = '💰 ' + data.balance + '🌟';
-                }
-                
-                if (data.result) {
-                    document.getElementById('resultText').innerHTML = data.result;
-                    
-                    if (data.new_balance !== undefined) {
-                        document.getElementById('balance').innerHTML = '💰 ' + data.new_balance + '🌟';
-                    }
-                }
-            } catch (e) {
-                console.log('Ошибка:', e);
+            let data = JSON.parse(event.data);
+            console.log('Ответ:', data);
+            
+            if (data.balance !== undefined) {
+                document.getElementById('balance').innerHTML = '💰 ' + data.balance + '🌟';
             }
-        });
-        
-        tg.onEvent('backButtonClicked', function() {
-            tg.close();
+            
+            if (data.result) {
+                document.getElementById('result').innerHTML = data.result;
+            }
+            
+            if (data.new_balance !== undefined) {
+                document.getElementById('balance').innerHTML = '💰 ' + data.new_balance + '🌟';
+            }
         });
     </script>
 </body>
