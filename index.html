@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎰 КАЗИНО ИГРЫ</title>
+    <title>🎰 МИНИ-КАЗИНО</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -28,7 +28,7 @@
         h1 {
             text-align: center;
             font-size: 32px;
-            margin-bottom: 30px;
+            margin: 20px 0;
             color: #ffd700;
             text-shadow: 0 0 15px rgba(255,215,0,0.3);
         }
@@ -47,7 +47,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .game-card {
@@ -74,95 +74,134 @@
         .game-title {
             font-size: 18px;
             font-weight: bold;
-            margin-bottom: 5px;
+            color: #ffd700;
         }
 
-        .game-desc {
-            font-size: 14px;
-            color: #888;
-        }
-
-        .info {
+        .bet-block {
             background: rgba(255,255,255,0.05);
-            border-radius: 15px;
+            border-radius: 20px;
             padding: 20px;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #aaa;
+            margin-top: 20px;
+        }
+
+        .bet-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 20px;
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            background: #1a1a2e;
+            color: white;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .play-btn {
+            width: 100%;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            border: none;
+            border-radius: 50px;
+            color: #1a1a2e;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .result {
+            text-align: center;
+            font-size: 32px;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎮 МИНИ-КАЗИНО</h1>
+        <h1>🎮 МИНИ-ИГРЫ</h1>
         
         <div class="balance" id="balance">
-            Загрузка баланса...
+            Загрузка...
         </div>
 
         <div class="games-grid">
-            <div class="game-card" onclick="startGame('rocket')">
+            <div class="game-card" onclick="selectGame('Ракета')">
                 <div class="game-emoji">🚀</div>
                 <div class="game-title">Ракета</div>
-                <div class="game-desc">Множитель до x10</div>
             </div>
-
-            <div class="game-card" onclick="startGame('tower')">
+            <div class="game-card" onclick="selectGame('Стройка')">
                 <div class="game-emoji">🏗️</div>
                 <div class="game-title">Стройка</div>
-                <div class="game-desc">Построй башню</div>
             </div>
-
-            <div class="game-card" onclick="startGame('dice')">
+            <div class="game-card" onclick="selectGame('Кости')">
                 <div class="game-emoji">🎲</div>
                 <div class="game-title">Кости</div>
-                <div class="game-desc">Классика</div>
             </div>
-
-            <div class="game-card" onclick="startGame('slots')">
+            <div class="game-card" onclick="selectGame('Слоты')">
                 <div class="game-emoji">🎰</div>
                 <div class="game-title">Слоты</div>
-                <div class="game-desc">Крути барабаны</div>
             </div>
         </div>
 
-        <div class="info">
-            ⚡ Как играть:<br>
-            • Выбери игру<br>
-            • Сделай ставку<br>
-            • Забери выигрыш<br>
-            • Джекпот 1% с каждой игры
+        <div id="gameBlock" class="bet-block">
+            <div style="font-size: 24px; margin-bottom: 10px;" id="selectedGame">🎮 Выбери игру</div>
+            <input type="number" id="bet" class="bet-input" value="10" min="1" placeholder="Ставка">
+            <button class="play-btn" onclick="playGame()">🎮 ИГРАТЬ</button>
+        </div>
+
+        <div id="resultBlock" class="result hidden">
+            <div id="resultText"></div>
         </div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
-        let userBalance = 0;
+        let selectedGame = '';
         
-        // На весь экран
         tg.expand();
         tg.ready();
         
-        // Запрашиваем баланс
-        tg.sendData(JSON.stringify({
-            action: 'get_balance'
-        }));
+        function selectGame(game) {
+            selectedGame = game;
+            document.getElementById('selectedGame').innerHTML = '🎮 ' + game;
+        }
         
-        function startGame(game) {
+        function playGame() {
+            if (!selectedGame) {
+                tg.showAlert('Сначала выбери игру!');
+                return;
+            }
+            
+            let bet = document.getElementById('bet').value;
+            
+            if (bet < 1) {
+                tg.showAlert('Ставка должна быть больше 0!');
+                return;
+            }
+            
+            document.getElementById('resultBlock').classList.remove('hidden');
+            document.getElementById('resultText').innerHTML = '⏳ Играем...';
+            
             tg.sendData(JSON.stringify({
                 action: 'play',
-                game: game
+                game: selectedGame,
+                bet: parseInt(bet)
             }));
         }
         
-        // Слушаем сообщения от бота
-        window.addEventListener('message', function(event) {
-            let data = JSON.parse(event.data);
-            if (data.balance) {
-                document.getElementById('balance').innerHTML = 
-                    `💰 Баланс: ${data.balance}🌟`;
-                userBalance = data.balance;
-            }
+        tg.onEvent('mainButtonClicked', function() {
+            tg.close();
         });
     </script>
 </body>
